@@ -8,7 +8,9 @@ The goal is to let a user configure the query in the browser, then produce a str
 
 🎯 Core Use Case
 
-A user wants to compare how often a term (e.g., Charlie Kirk, Project 2025, Ukraine war, J6 pardons) is searched across multiple regions and time windows.
+A user wants to compare how often a term (e.g., Charlie Kirk, Utah Valley University, Rahmanullah Lakanwal, etc) is searched across multiple regions and time windows relevant to a major United States event to see if little known names or places were searched in advance of the event.
+
+This includes seeminging irrelevant cities like Chicago and Philadelphia to see if searches from DC and Tel Aviv are anomolous or just low level noise.
 
 Example:
 
