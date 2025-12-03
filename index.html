@@ -1,0 +1,747 @@
+<div style="background:red;color:white;padding:4px;">BETA VERSION 3
+currently avaialable at tools.clearruleoflaw.org</div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Google Trends Dashboard (Beta) • CLEAR Tools</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <style>
+    /* ===== Base page styling (match Tools Against Tyranny) ===== */
+    :root {
+      --bg-charcoal: #1A1D1E;
+      --bg-panel-dark: #2A2D2F;
+      --bg-panel-grad: linear-gradient(145deg, #2A2D2F, #1A1D1E);
+      --text-parchment: #F3E8D0;
+      --text-muted: #D6B98C;
+      --accent-amber: #D28B39;
+      --accent-amber-soft: #E5CFA8;
+      --accent-blue: #3B82F6;
+      --accent-red: #F97373;
+      --border-soft: rgba(0,0,0,0.35);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+      background: var(--bg-charcoal);
+      color: var(--text-parchment);
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+      padding: 32px 12px;
+    }
+
+    .shell {
+      width: 100%;
+      max-width: 980px;
+      margin: 0 auto;
+      background: var(--bg-panel-grad);
+      border-radius: 14px;
+      box-shadow:
+        0 0 40px rgba(210, 139, 57, 0.12),
+        0 18px 40px rgba(0,0,0,0.65);
+      padding: 28px 32px 32px;
+      position: relative;
+    }
+
+    /* Small "beta" tag */
+    .beta-tag {
+      position: absolute;
+      top: 12px;
+      left: 16px;
+      background: #B91C1C;
+      color: #F9FAFB;
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 3px 8px;
+      border-radius: 4px;
+    }
+
+    /* Header with logo + title */
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      margin-bottom: 18px;
+    }
+
+    .logo {
+      width: 230px;
+      border-radius: 10px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.45);
+    }
+
+    .header-text h1 {
+      margin: 0 0 4px;
+      font-size: 1.9rem;
+      letter-spacing: 1.4px;
+      color: #E5CFA8;
+    }
+
+    .header-text p {
+      margin: 0;
+      font-size: 0.95rem;
+      color: var(--text-muted);
+    }
+
+    hr.section-divider {
+      border: none;
+      border-top: 1px solid rgba(255,255,255,0.06);
+      margin: 16px 0 20px;
+    }
+
+    /* ===== Form sections ===== */
+    .section {
+      margin-bottom: 20px;
+    }
+
+    .section-title {
+      font-weight: 600;
+      margin-bottom: 4px;
+      font-size: 1rem;
+      color: #E5CFA8;
+    }
+
+    .section-subtitle {
+      margin: 0 0 8px;
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+
+    label {
+      display: block;
+      font-size: 0.85rem;
+      margin-bottom: 4px;
+      color: #E5CFA8;
+    }
+
+    .input-text {
+      width: 100%;
+      padding: 10px 12px;
+      background: #111315;
+      border-radius: 6px;
+      border: 1px solid #3B3F43;
+      color: var(--text-parchment);
+      font-size: 0.95rem;
+      outline: none;
+    }
+
+    .input-text::placeholder {
+      color: #777B80;
+    }
+
+    .input-text:focus {
+      border-color: var(--accent-amber);
+      box-shadow: 0 0 0 1px rgba(210,139,57,0.4);
+    }
+
+    /* Time range checkboxes */
+    .time-options {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .time-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: #111315;
+      cursor: pointer;
+      font-size: 0.82rem;
+      color: #E5CFA8;
+      transition: all 0.15s ease-in-out;
+    }
+
+    .time-chip input {
+      accent-color: var(--accent-amber);
+    }
+
+    .time-chip:hover {
+      border-color: var(--accent-amber-soft);
+      background: #1F2326;
+    }
+
+    /* Regions row */
+    .region-input-row {
+      display: flex;
+      gap: 8px;
+      align-items: stretch;
+      position: relative; /* for suggestions panel */
+      margin-bottom: 10px;
+    }
+
+    .region-input-row .input-text {
+      flex: 1;
+    }
+
+    .btn-amber {
+      background: var(--accent-amber);
+      color: #1A1D1E;
+      border: none;
+      border-radius: 8px;
+      padding: 10px 18px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: 0.2s ease-in-out;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.35);
+    }
+
+    .btn-amber:hover {
+      background: var(--accent-amber-soft);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 16px rgba(0,0,0,0.45);
+    }
+
+    /* Suggestions dropdown from JSON */
+    .region-suggestions {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 140px; /* leave room for Add Region button */
+      background: #111315;
+      border-radius: 6px;
+      border: 1px solid #3B3F43;
+      margin-top: 4px;
+      max-height: 230px;
+      overflow-y: auto;
+      z-index: 20;
+      box-shadow: 0 10px 28px rgba(0,0,0,0.65);
+      display: none;
+    }
+
+    .region-suggestion-item {
+      padding: 7px 10px;
+      font-size: 0.85rem;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .region-suggestion-item span.code {
+      color: #9CA3AF;
+      font-family: "SF Mono", ui-monospace, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 0.78rem;
+    }
+
+    .region-suggestion-item:hover {
+      background: #1F2326;
+    }
+
+    /* Region chips row */
+    .region-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+
+    .region-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 10px;
+      border-radius: 999px;
+      font-size: 0.82rem;
+      border: 1px solid rgba(0,0,0,0.4);
+      background: #111315;
+      color: #E5CFA8;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.45);
+    }
+
+    .region-chip.core {
+      background: var(--accent-amber);
+      color: #1A1D1E;
+    }
+
+    .region-chip.control {
+      background: #1D4ED8;
+      color: #E5F0FF;
+    }
+
+    .region-chip.custom {
+      background: #B91C1C;
+      color: #FEE2E2;
+    }
+
+    .chip-close {
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 0.8rem;
+      line-height: 1;
+      opacity: 0.8;
+    }
+
+    .chip-close:hover {
+      opacity: 1;
+    }
+
+    .region-chip small {
+      font-size: 0.72rem;
+      opacity: 0.9;
+    }
+
+    /* Output summary + button */
+    .output-summary {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      margin-bottom: 14px;
+    }
+
+    .btn-preview {
+      width: 100%;
+      margin-top: 4px;
+      margin-bottom: 4px;
+    }
+
+    .footer-note {
+      margin-top: 6px;
+      font-size: 0.8rem;
+      color: #9CA3AF;
+      opacity: 0.9;
+    }
+
+    .back-link {
+      margin-top: 14px;
+      font-size: 0.85rem;
+    }
+
+    .back-link a {
+      color: var(--accent-amber-soft);
+      text-decoration: none;
+    }
+
+    .back-link a:hover {
+      text-decoration: underline;
+    }
+
+    @media (max-width: 720px) {
+      .shell {
+        padding: 20px 16px 24px;
+      }
+      .header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .logo {
+        width: 200px;
+      }
+    }
+    /* Substack subscribe section */
+.substack-section {
+  margin: 48px auto 24px;
+  max-width: 720px;
+  padding: 24px 20px 28px;
+  border-radius: 16px;
+  background: #17191c;
+  border: 1px solid #26292e;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.6);
+}
+
+.substack-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.substack-heading {
+  margin: 0;
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: #f9e0b5; /* matches your amber headline tone */
+}
+
+.substack-tagline {
+  margin: 0;
+  font-size: 0.95rem;
+  color: #b0b3b8;
+}
+
+.substack-embed-wrapper {
+  margin-top: 8px;
+}
+
+/* Button under the iframe */
+.substack-button-wrapper {
+  text-align: center;
+  margin-top: 16px;
+}
+
+.substack-button {
+  display: inline-block;
+  padding: 10px 22px;
+  border-radius: 999px;
+  background: #f4a744;
+  color: #111;
+  font-weight: 600;
+  font-size: 0.95rem;
+  text-decoration: none;
+  letter-spacing: 0.02em;
+}
+
+.substack-button:hover {
+  filter: brightness(1.05);
+  transform: translateY(-1px);
+}
+
+.substack-button:active {
+  filter: brightness(0.96);
+  transform: translateY(0);
+}
+
+/* Mobile tweaks */
+@media (max-width: 600px) {
+  .substack-section {
+    margin: 36px 12px 20px;
+    padding: 20px 16px 24px;
+  }
+}
+
+  </style>
+  
+</head>
+<body>
+
+<div class="shell">
+  <div class="beta-tag">Beta Version</div>
+
+  <div class="header">
+    <img src="https://tools.clearruleoflaw.org/CLEAR_Logo.png" alt="CLEAR Logo" class="logo" />
+    <div class="header-text">
+      <h1>Google Trends Dashboard</h1>
+      <p>
+        Plan CSV downloads and spreadsheet layouts by search term, time range, and region
+        <em>before</em> touching Google Trends.
+      </p>
+    </div>
+  </div>
+
+  <hr class="section-divider" />
+
+  <!-- 1. Search term -->
+  <div class="section">
+    <div class="section-title">1. Search Term</div>
+    <p class="section-subtitle">
+      One Google Trends search term per run (e.g. <em>Charlie Kirk</em>, <em>Project 2025</em>, <em>J6 pardons</em>).
+    </p>
+    <input id="search-term" class="input-text"
+           type="text"
+           placeholder="Enter a single search term" />
+  </div>
+
+  <!-- 2. Time ranges -->
+  <div class="section">
+    <div class="section-title">2. Time Range(s)</div>
+    <p class="section-subtitle">
+      Choose one or more. Each time range will eventually become its own sheet in the output workbook.
+    </p>
+    <div class="time-options">
+      <label class="time-chip"><input type="checkbox" value="now 1-H" checked />1 hour</label>
+      <label class="time-chip"><input type="checkbox" value="now 4-H" />4 hours</label>
+      <label class="time-chip"><input type="checkbox" value="now 1-d" />1 day</label>
+      <label class="time-chip"><input type="checkbox" value="now 7-d" />7 days</label>
+      <label class="time-chip"><input type="checkbox" value="today 1-m" />30 days</label>
+      <label class="time-chip"><input type="checkbox" value="today 3-m" />90 days</label>
+      <label class="time-chip"><input type="checkbox" value="today 12-m" />1 year</label>
+    </div>
+  </div>
+
+  <!-- 3. Regions -->
+  <div class="section">
+    <div class="section-title">3. Regions to Compare</div>
+    <p class="section-subtitle">
+      Default CLEAR-relevant regions (amber) and comparison cities (blue) are pre-selected.
+      Add your own regions (red) below. Each region will eventually be a column in the spreadsheet.
+    </p>
+
+    <div class="region-input-row">
+      <input id="region-input" class="input-text"
+             type="text"
+             autocomplete="off"
+             placeholder="Type a region name or code (e.g. 511, US-DC, Israel, Tel Aviv, 602)..." />
+      <button id="add-region" class="btn-amber">Add Region</button>
+
+      <!-- JSON-driven suggestions -->
+      <div id="region-suggestions" class="region-suggestions"></div>
+    </div>
+
+    <div id="region-chips" class="region-chips"></div>
+
+    <p class="footer-note">
+      Suggestions are powered by <code>google-trends-locations.json</code> and use Google
+      Trends region names/codes. Custom entries are allowed but may not correspond to a valid Trends region.
+    </p>
+  </div>
+
+  <!-- 4. Output planning -->
+  <div class="section">
+    <div class="section-title">4. Plan Spreadsheet Output</div>
+    <p class="output-summary" id="output-summary">
+      When wired to Google Trends, this tool will build a multi-sheet workbook:
+      one sheet per selected time range, with columns for each region you’ve chosen.
+    </p>
+
+    <button class="btn-amber btn-preview" type="button" id="preview-plan">
+      Preview Spreadsheet Plan (UI only — no data yet)
+    </button>
+
+    <p class="footer-note" id="preview-details">
+      Select at least one time range and one region to see a summary here.
+    </p>
+  </div>
+
+  <div class="back-link">
+    ← <a href="/">Back to Tools Against Tyranny</a>
+  </div>
+
+<script>
+  // ===== Load region JSON and wire suggestions / chips =====
+
+  // This will hold { code, name } pairs from google-trends-locations.json
+  let allRegions = [];
+
+  // Selected regions as { code, name, kind }
+  // kind: 'core' (amber), 'control' (blue), 'custom' (red)
+  let selectedRegions = [];
+
+  const regionInput = document.getElementById('region-input');
+  const regionSuggestions = document.getElementById('region-suggestions');
+  const regionChips = document.getElementById('region-chips');
+  const outputSummary = document.getElementById('output-summary');
+  const previewDetails = document.getElementById('preview-details');
+
+  // Fetch JSON on load
+  fetch('google-trends-locations.json')
+    .then(res => res.json())
+    .then(json => {
+      allRegions = Object.entries(json).map(([code, name]) => ({
+        code,
+        name,
+        searchKey: (code + ' ' + name).toLowerCase()
+      }));
+      initPreselectedRegions();
+      refreshChips();
+      updatePlanSummary();
+    })
+    .catch(err => {
+      console.error('Error loading google-trends-locations.json', err);
+    });
+
+  // Preselected CLEAR + control regions
+  function initPreselectedRegions() {
+    const core = [
+      { code: '511', name: 'Washington, D.C. Metro' },   // Washington DC (Hagerstown MD)
+      { code: '548', name: 'Palm Beach, FL' },           // West Palm Beach–Ft. Pierce FL
+      { code: 'IL',  name: 'Israel' }
+    ];
+
+    const controls = [
+      { code: '504', name: 'Philadelphia, PA' },
+      { code: '602', name: 'Chicago, IL' },
+      { code: '820', name: 'Portland, OR' }
+    ];
+
+    selectedRegions = [
+      ...core.map(r => ({ ...r, kind: 'core' })),
+      ...controls.map(r => ({ ...r, kind: 'control' }))
+    ];
+  }
+
+  // Render region chips
+  function refreshChips() {
+    regionChips.innerHTML = '';
+    selectedRegions.forEach((region, index) => {
+      const chip = document.createElement('div');
+      chip.className = 'region-chip ' + region.kind;
+
+      const label = document.createElement('span');
+      label.textContent = region.name;
+
+      const small = document.createElement('small');
+      small.textContent = ' (' + region.code + ')';
+
+      const close = document.createElement('span');
+      close.className = 'chip-close';
+      close.textContent = '×';
+      close.title = 'Remove region';
+      close.addEventListener('click', () => {
+        selectedRegions.splice(index, 1);
+        refreshChips();
+        updatePlanSummary();
+      });
+
+      chip.appendChild(label);
+      chip.appendChild(small);
+      chip.appendChild(close);
+      regionChips.appendChild(chip);
+    });
+  }
+
+  // Add region either from suggestion or from raw text
+  function addRegionFromInput() {
+    const raw = regionInput.value.trim();
+    if (!raw) return;
+
+    let matched = null;
+
+    const query = raw.toLowerCase();
+
+    // 1. match by code
+    matched = allRegions.find(r => r.code.toLowerCase() === query);
+
+    // 2. or by exact name (case-insensitive)
+    if (!matched) {
+      matched = allRegions.find(r => r.name.toLowerCase() === query);
+    }
+
+    // 3. or first partial match
+    if (!matched) {
+      matched = allRegions.find(r => r.searchKey.includes(query));
+    }
+
+    let newRegion;
+    if (matched) {
+      newRegion = {
+        code: matched.code,
+        name: matched.name,
+        kind: 'custom'
+      };
+    } else {
+      newRegion = {
+        code: raw,
+        name: raw + ' (custom)',
+        kind: 'custom'
+      };
+    }
+
+    // Avoid duplicates by code
+    if (!selectedRegions.some(r => r.code === newRegion.code)) {
+      selectedRegions.push(newRegion);
+      refreshChips();
+      updatePlanSummary();
+    }
+
+    regionInput.value = '';
+    hideSuggestions();
+  }
+
+  document.getElementById('add-region').addEventListener('click', () => {
+    addRegionFromInput();
+  });
+
+  regionInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      addRegionFromInput();
+    }
+  });
+
+  // Suggestions logic – show only after 2 chars, max 10 results
+  regionInput.addEventListener('input', () => {
+    const value = regionInput.value.trim().toLowerCase();
+    if (value.length < 2) {
+      hideSuggestions();
+      return;
+    }
+
+    const matches = allRegions
+      .filter(r => r.searchKey.includes(value))
+      .slice(0, 10);
+
+    if (!matches.length) {
+      hideSuggestions();
+      return;
+    }
+
+    regionSuggestions.innerHTML = '';
+    matches.forEach(r => {
+      const item = document.createElement('div');
+      item.className = 'region-suggestion-item';
+
+      const nameSpan = document.createElement('span');
+      nameSpan.textContent = r.name;
+
+      const codeSpan = document.createElement('span');
+      codeSpan.className = 'code';
+      codeSpan.textContent = r.code;
+
+      item.appendChild(nameSpan);
+      item.appendChild(codeSpan);
+
+      item.addEventListener('click', () => {
+        // When chosen from list, add as custom region (red)
+        if (!selectedRegions.some(x => x.code === r.code)) {
+          selectedRegions.push({
+            code: r.code,
+            name: r.name,
+            kind: 'custom'
+          });
+          refreshChips();
+          updatePlanSummary();
+        }
+        regionInput.value = '';
+        hideSuggestions();
+      });
+
+      regionSuggestions.appendChild(item);
+    });
+    regionSuggestions.style.display = 'block';
+  });
+
+  function hideSuggestions() {
+    regionSuggestions.style.display = 'none';
+  }
+
+  document.addEventListener('click', (e) => {
+    if (!regionSuggestions.contains(e.target) && e.target !== regionInput) {
+      hideSuggestions();
+    }
+  });
+
+  // Simple UI-only plan preview
+  document.getElementById('preview-plan').addEventListener('click', updatePlanSummary);
+
+  function updatePlanSummary() {
+    const term = document.getElementById('search-term').value.trim() || '(no term set yet)';
+
+    const timeValues = Array.from(
+      document.querySelectorAll('.time-options input[type="checkbox"]:checked')
+    ).map(cb => cb.parentElement.textContent.trim());
+
+    const regionNames = selectedRegions.map(r => r.name);
+
+    if (!timeValues.length || !regionNames.length) {
+      previewDetails.textContent =
+        'Select at least one time range and one region to see a detailed plan.';
+      return;
+    }
+
+    outputSummary.textContent =
+      'This configuration will produce one sheet per selected time range, ' +
+      'with columns for each region you\'ve chosen.';
+
+    previewDetails.textContent =
+      'Sheets: ' + timeValues.join(', ') +
+      '.  Columns per sheet: ' + regionNames.join(', ') +
+      '.  Search term for this run: "' + term + '".';
+  }
+</script>
+
+</div>
+</body>
+</html>
